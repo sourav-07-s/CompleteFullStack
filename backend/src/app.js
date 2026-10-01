@@ -2,8 +2,10 @@ const express = require("express")
 const multer =require("multer")
 const uploadFile = require("./services/storage.service")
 const postModel = require("./models/post.model")
+const cors = require("cors")
 
 const app = express() ;
+app.use(cors()) ;
 app.use(express.json());
 
 
