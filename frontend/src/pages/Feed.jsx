@@ -17,7 +17,9 @@ const Feed = () => {
    } , [])
 
   return (
-    <section  className="flex flex-col items-center justify-center h-screen bg-black text-white">
+    <>
+      <div>
+    <section  className="flex flex-row gap-2.5 items-center justify-center min-h-screen w-full bg-black text-white">
       
       {
         posts.length >0 ? (
@@ -33,6 +35,8 @@ const Feed = () => {
         
     
     </section>
+    </div>
+    </>
   )
 }
 

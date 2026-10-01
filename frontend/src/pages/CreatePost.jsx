@@ -1,11 +1,36 @@
 import React from "react";
+import axios from "axios";
 
 const CreatePost = () => {
+
+         const handlesubmit = async (e)=>{
+            e.preventDefault() ;
+         
+
+          const formData = new FormData(e.target)
+
+          axios.post("http://localhost:3000/create_post" , formData , )
+                      .then((res)=>{
+                console.log(res.data) ;
+             })
+             .catch((error)=>{
+                aleart("error while creating post") ;
+             })
+        
+            }
+
+
+
+
+
+
   return (
     <section className="flex flex-col items-center justify-center h-screen bg-black text-white">
           <h1 className="text-3xl font-extrabold mb-10 font-serif">Create Post </h1>
 
-      <form className="flex flex-col gap-5 w-1/3 p-6 rounded-xl">
+      <form className="flex flex-col gap-5 w-1/3 p-6 rounded-xl   " 
+      onSubmit={handlesubmit}
+      >
 
         
         <div className="flex justify-center">
@@ -45,6 +70,7 @@ const CreatePost = () => {
                      text-white rounded-3xl
                      hover:bg-green-700
                      transition mx-auto"
+                   
         >
           Submit
         </button>
