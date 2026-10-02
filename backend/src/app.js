@@ -28,8 +28,6 @@ app.post("/create_post", upload.single("Image") , async (req , res)=> {
         message : " post created sucessfully" ,
         post 
      })
-
-
      
 })
 
