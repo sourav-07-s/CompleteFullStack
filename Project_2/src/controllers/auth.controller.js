@@ -6,6 +6,15 @@ const jwt = require('jsonwebtoken') ;
 async function registerUser(req , res){
     const { username , email , password } = req.body ;
 
+
+ const isAlreadyRegistered = await userModel.findOne({ email }) ;
+    if(isAlreadyRegistered){
+        return res.status(409).json({
+            message : 'User already registered'
+        })
+    }
+
+
     const user = await userModel.create({ username , email , password }) ;
 
 
@@ -14,6 +23,9 @@ async function registerUser(req , res){
         
     },process.env.JWT_SECRET 
 )
+      res.cookie('token', token)
+
+
     res.status(201).json({
         message : 'User registered successfully' ,
         user ,
