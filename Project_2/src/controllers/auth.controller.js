@@ -10,7 +10,7 @@ async function registerUser(req , res){
  const isAlreadyRegistered = await userModel.findOne({ email }) ;
     if(isAlreadyRegistered){
         return res.status(409).json({
-            message : 'User already registered'
+            message : 'Email already registered'
         })
     }
 
