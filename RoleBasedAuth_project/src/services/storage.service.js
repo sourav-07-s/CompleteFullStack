@@ -9,6 +9,13 @@ const ImagekitClient = new ImageKit({
 
 
 async function UploadFile(files){
-    const results =  await ImagekitClient.files.upload({})
+    const results =  await ImagekitClient.files.upload({
+        files,
+        fileName : "FILE_" + Date.now() ,
+        folder : "RoleBasedAuth_project/Admin-File"
+    })
 
 }
+
+
+module.exports = {UploadFile}
