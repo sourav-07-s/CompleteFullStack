@@ -1,4 +1,5 @@
-const userModel = require("../models/admin.model")
+const AdminModel = require("../models/admin.model")
+const {uploadFile} = require("../services/storage.service")
 const jwt = require("jsonwebtoken")
 
 
@@ -34,6 +35,29 @@ async function createPannel(req , res){
       const {title} = req.body
       const file = req.file 
 
+      const result = await uploadFile(file.buffer.toString("base64"))
+
+      const Pannel = AdminModel.create({
+        uri : result.url,
+        title ,
+        admin : decoded._id ,
+
+      })
+
+      res.status(201).json({
+        message : "Pannel Created Sucessfully" ,
+
+        adminInfo : {
+            id : Pannel._id,
+            uri : Pannel.uri ,
+            title : Pannel.title ,
+            Admin : Pannel.admin ,
+
+        }
+      })
 
 
 }
+
+
+module.exports = {createPannel}
