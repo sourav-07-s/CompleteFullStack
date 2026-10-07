@@ -1,22 +1,22 @@
-const  {ImageKit } = require("@imagekit/nodejs")
-
-
+const { ImageKit } = require("@imagekit/nodejs");
 
 const ImagekitClient = new ImageKit({
-    privateKey : process.env.IMAGEKIT_P_KEY
+    privateKey: process.env.IMAGEKIT_P_KEY
+});
 
-})
+async function uploadFile(fileBuffer) {
 
-async function UploadFile(files){
-    const results =  await ImagekitClient.files.upload({
-        files,
-        fileName : "FILE_" + Date.now() ,
-        folder : "RoleBasedAuth_project/Admin-File"
-    })
+    console.log("ImageKit: upload started");
 
-   return results ;
+    const results = await ImagekitClient.files.upload({
+        file: fileBuffer,
+        fileName: "FILE_" + Date.now(),
+        folder: "RoleBasedAuth_project/Admin-File"
+    });
 
+    console.log("ImageKit: upload finished");
+
+    return results;
 }
 
-
-module.exports = {UploadFile}
+module.exports = { uploadFile };

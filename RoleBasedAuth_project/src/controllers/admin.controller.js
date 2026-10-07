@@ -15,7 +15,7 @@ async function createPannel(req , res){
      }
 
      try {
-      const decoded =   jwt.verify(process.env.JWT_SECRET)
+      const decoded =  jwt.verify(token, process.env.JWT_SECRET);
 
               if(decoded.role !== "admin"){
                 return res.status(401).json({
@@ -23,24 +23,17 @@ async function createPannel(req , res){
                 })
               }
 
-
-
-     } catch(error){
-        return res.status(401).json({
-            message : "UnAuthorised" , error
-        })
-     }
-
+              
 
       const {title} = req.body
       const file = req.file 
 
       const result = await uploadFile(file.buffer.toString("base64"))
 
-      const Pannel = AdminModel.create({
+      const Pannel =  await AdminModel.create({
         uri : result.url,
         title ,
-        admin : decoded._id ,
+        admin : decoded.id ,
 
       })
 
@@ -48,13 +41,24 @@ async function createPannel(req , res){
         message : "Pannel Created Sucessfully" ,
 
         adminInfo : {
-            id : Pannel._id,
+            id : Pannel.id,
             uri : Pannel.uri ,
             title : Pannel.title ,
             Admin : Pannel.admin ,
 
         }
       })
+
+       } 
+       catch (error) {
+    console.log("ERROR:", error);
+
+    return res.status(401).json({
+        message: "Unauthorised",
+        error: error.message
+    });
+}
+      
 
 
 }
