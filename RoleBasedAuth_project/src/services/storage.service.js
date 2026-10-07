@@ -3,10 +3,9 @@ const  {ImageKit } = require("@imagekit/nodejs")
 
 
 const ImagekitClient = new ImageKit({
-    privateKey : process.env.IMAGEKIT_PRIVATE_KEY ,
+    privateKey : process.env.IMAGEKIT_P_KEY
 
 })
-
 
 async function UploadFile(files){
     const results =  await ImagekitClient.files.upload({
@@ -14,6 +13,8 @@ async function UploadFile(files){
         fileName : "FILE_" + Date.now() ,
         folder : "RoleBasedAuth_project/Admin-File"
     })
+
+   return results ;
 
 }
 
