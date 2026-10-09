@@ -14,6 +14,8 @@ const router = express.Router() ;
 
 router.post("/upload-admin" ,upload.single("music") , adminController.createPannel)
 
+router.post("/create-album" , adminController.createAlbum)
+
 
 
 module.exports = router ;
