@@ -1,7 +1,6 @@
 const AdminModel = require("../models/admin.model")
 const albumModel = require("../models/album.model")
 const {uploadFile} = require("../services/storage.service")
-const jwt = require("jsonwebtoken")
 
 
 
@@ -67,7 +66,7 @@ async function CreateAlbum(req , res){
 async function getAllmusics(req , res){
 
 
-   const musics = await AdminModel.find()
+   const musics = await AdminModel.find().populate("admin" , "username email role") ;
 
 
    res.status(200).json({

@@ -1,23 +1,23 @@
-const express = require("express") ;
-const adminController = require("../controllers/admin.controller");
-
-const multer = require("multer")
-
-
+const express = require('express');
+const musicController = require("../controllers/admin.controller")
+const authMiddleware = require("../middlewares/auth.middleware")
+const multer = require('multer');
 
 const upload = multer({
-    storage : multer.memoryStorage()
+    storage: multer.memoryStorage()
 })
 
-
-const router = express.Router() ;
-
-router.post("/upload-admin" ,upload.single("music") , adminController.createPMusics)
-
-router.post("/create-album" , adminController.CreateAlbum)
-
-router.get("/" , adminController.getAllmusics)
+const router = express.Router();
 
 
+router.post("/upload", authMiddleware.authAdmin, upload.single("music"), musicController.createPMusics)
 
-module.exports = router ;
+router.post("/album", authMiddleware.authAdmin, musicController.CreateAlbum)
+
+router.get("/", authMiddleware.authUser, musicController.getAllmusics)
+
+
+
+
+
+module.exports = router;
