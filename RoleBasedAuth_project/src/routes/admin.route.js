@@ -12,9 +12,11 @@ const upload = multer({
 
 const router = express.Router() ;
 
-router.post("/upload-admin" ,upload.single("music") , adminController.createPannel)
+router.post("/upload-admin" ,upload.single("music") , adminController.createPMusics)
 
-router.post("/create-album" , adminController.createAlbum)
+router.post("/create-album" , adminController.CreateAlbum)
+
+router.get("/" , adminController.getAllmusics)
 
 
 
