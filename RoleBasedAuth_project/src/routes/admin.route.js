@@ -16,6 +16,7 @@ router.post("/album", authMiddleware.authAdmin, musicController.CreateAlbum)
 
 router.get("/", authMiddleware.authUser, musicController.getAllmusics)
 
+router.get("/albums" , authMiddleware.authUser, musicController.getAllAlbums)
 
 
 

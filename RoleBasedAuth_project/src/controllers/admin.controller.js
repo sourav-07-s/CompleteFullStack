@@ -76,6 +76,17 @@ async function getAllmusics(req , res){
 
 }
 
+async function getAllAlbums(req , res){
+
+  const albums = await albumModel.find() ;
+
+  res.status(200).json({
+    message : "Albums fetched sucessfully" ,
+    albums : albums
+  })
+
+
+}
  
 
-module.exports = {createPMusics , CreateAlbum , getAllmusics}
+module.exports = {createPMusics , CreateAlbum , getAllmusics , getAllAlbums}
