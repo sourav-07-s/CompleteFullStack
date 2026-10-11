@@ -18,6 +18,7 @@ router.get("/", authMiddleware.authUser, musicController.getAllmusics)
 
 router.get("/albums" , authMiddleware.authUser, musicController.getAllAlbums)
 
+router.get("/albums/:id", authMiddleware.authUser, musicController.getAllAlbumById)
 
 
 

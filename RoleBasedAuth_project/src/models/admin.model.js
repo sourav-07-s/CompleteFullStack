@@ -13,7 +13,7 @@ const adminSchema =  new mongoose.Schema({
     },
     admin : {
         type : mongoose.Schema.Types.ObjectId ,
-        ref : "user" ,
+        ref : "User" ,
         required : true 
     }
 })

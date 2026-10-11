@@ -66,7 +66,7 @@ async function CreateAlbum(req , res){
 async function getAllmusics(req , res){
 
 
-   const musics = await AdminModel.find().populate("admin" , "username email role") ;
+   const musics = await AdminModel.find().limit(20).populate("admin" , "username email role") ;
 
 
    res.status(200).json({
@@ -88,5 +88,17 @@ async function getAllAlbums(req , res){
 
 }
  
+async function getAllAlbumById(req , res){
 
-module.exports = {createPMusics , CreateAlbum , getAllmusics , getAllAlbums}
+ const  albumId = req.params.id
+
+ const album = await albumModel.findById(albumId).populate("admin" , " username email") ;
+  
+ res.status(200).json({
+    message : "Album fetched sucessfully" ,
+    album : album
+  })
+
+}
+
+module.exports = {createPMusics , CreateAlbum , getAllmusics , getAllAlbums , getAllAlbumById}
