@@ -1,7 +1,7 @@
 const mongoose = require("mongoose" ) ;
 
 
-const adminSchema =  new mongoose.Schema({
+const MusicsSchema =  new mongoose.Schema({
     uri : {
         type : String ,
         required : true
@@ -13,12 +13,12 @@ const adminSchema =  new mongoose.Schema({
     },
     admin : {
         type : mongoose.Schema.Types.ObjectId ,
-        ref : "User" ,
+        ref : "user" ,
         required : true 
     }
 })
 
 
-const AdminModel =  mongoose.model("admin", adminSchema) ;
+const MusicsModel =  mongoose.model("musics", MusicsSchema) ;
 
-module.exports = AdminModel ;
+module.exports = MusicsModel ;

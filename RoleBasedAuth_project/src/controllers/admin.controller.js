@@ -1,4 +1,4 @@
-const AdminModel = require("../models/admin.model")
+const MusicsModel = require("../models/Musics.model")
 const albumModel = require("../models/album.model")
 const {uploadFile} = require("../services/storage.service")
 
@@ -11,7 +11,7 @@ async function createPMusics(req , res){
 
       const result = await uploadFile(file.buffer.toString("base64"))
 
-      const Pannel =  await AdminModel.create({
+      const Pannel =  await MusicsModel.create({
         uri : result.url,
         title ,
         admin : req.user.id ,
@@ -66,7 +66,7 @@ async function CreateAlbum(req , res){
 async function getAllmusics(req , res){
 
 
-   const musics = await AdminModel.find().limit(20).populate("admin" , "username email role") ;
+   const musics = await MusicsModel.find().limit(20).populate("admin" , "username email role") ;
 
 
    res.status(200).json({
@@ -92,7 +92,7 @@ async function getAllAlbumById(req , res){
 
  const  albumId = req.params.id
 
- const album = await albumModel.findById(albumId).populate("admin" , " username email") ;
+ const album = await albumModel.findById(albumId).populate("admin" , " username email").populate("musics" , "title uri") ;
   
  res.status(200).json({
     message : "Album fetched sucessfully" ,
