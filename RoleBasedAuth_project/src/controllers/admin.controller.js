@@ -78,7 +78,7 @@ async function getAllmusics(req , res){
 
 async function getAllAlbums(req , res){
 
-  const albums = await albumModel.find().select("title admin").populate("admin" , "username email role") ;
+  const albums = await albumModel.find().select("title admin").populate("admin" , "username email ") ;
 
   res.status(200).json({
     message : "Albums fetched sucessfully" ,
