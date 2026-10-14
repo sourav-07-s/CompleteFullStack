@@ -16,5 +16,4 @@ app.use(cookieParser()) ;
  app.use('/api/admin' , adminrouter)
 
 
-
 module.exports = app ;
