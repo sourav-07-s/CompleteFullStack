@@ -10,5 +10,6 @@ const mongoose = require('mongoose') ;
          console.log("error in connecting to db",error) ;
     }
  }
+ 
 
  module.exports = connectDb ;
