@@ -1,122 +1,131 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useCallback, useEffect, useState } from 'react';
+import { AlertCircle, LoaderCircle } from 'lucide-react';
+import AppHeader from './components/AppHeader';
+import AudioPlayer from './components/AudioPlayer';
+import AuthPage from './pages/AuthPage';
+import HomePage from './pages/HomePage';
+import ExplorePage from './pages/ExplorePage';
+import AlbumsPage from './pages/AlbumsPage';
+import AdminPage from './pages/AdminPage';
+import { api, getErrorMessage } from './lib/api';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function readRoute() {
+  const value = window.location.hash.replace(/^#/, '') || '/';
+  return value.startsWith('/') ? value : `/${value}`;
 }
 
-export default App
+export default function App() {
+  const [route, setRoute] = useState(readRoute);
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('musicfy:user') || 'null'); }
+    catch { return null; }
+  });
+  const [tracks, setTracks] = useState([]);
+  const [libraryLoading, setLibraryLoading] = useState(false);
+  const [libraryError, setLibraryError] = useState('');
+  const [search, setSearch] = useState('');
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [queue, setQueue] = useState([]);
+  const [checkingSession, setCheckingSession] = useState(Boolean(user));
+
+  const navigate = useCallback((path) => {
+    if (path === route) return;
+    window.location.hash = path;
+  }, [route]);
+
+  useEffect(() => {
+    const syncRoute = () => setRoute(readRoute());
+    window.addEventListener('hashchange', syncRoute);
+    if (!window.location.hash) window.location.hash = '/';
+    return () => window.removeEventListener('hashchange', syncRoute);
+  }, []);
+
+  const loadLibrary = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLibraryLoading(true);
+    setLibraryError('');
+    try {
+      const result = await api.getMusic();
+      const nextTracks = Array.isArray(result.musics) ? result.musics : [];
+      setTracks(nextTracks);
+      return nextTracks;
+    } catch (error) {
+      setLibraryError(getErrorMessage(error));
+      throw error;
+    } finally {
+      setLibraryLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!user) { setCheckingSession(false); return undefined; }
+    setCheckingSession(true);
+    api.getMusic().then((result) => {
+      if (!active) return;
+      setTracks(Array.isArray(result.musics) ? result.musics : []);
+      setLibraryError('');
+    }).catch(() => {
+      if (!active) return;
+      setUser(null);
+      setTracks([]);
+      localStorage.removeItem('musicfy:user');
+    }).finally(() => { if (active) setCheckingSession(false); });
+    return () => { active = false; };
+  }, []); // Validate the stored UI identity against the protected backend route once on startup.
+
+  const authenticate = async (form) => {
+    const result = route === '/register'
+      ? await api.register({ username: form.username.trim(), email: form.email.trim(), password: form.password })
+      : await api.login(form.username.trim(), form.password);
+    const raw = result.user || {};
+    const nextUser = {
+      id: raw.id || raw._id,
+      username: raw.username || form.username,
+      email: raw.email || raw.emial || form.email || '',
+      role: raw.role || 'user',
+    };
+    setUser(nextUser);
+    localStorage.setItem('musicfy:user', JSON.stringify(nextUser));
+    try { await loadLibrary({ quiet: true }); } catch { /* Auth succeeded; the library can be retried from Explore. */ }
+    navigate(nextUser.role === 'admin' ? '/admin' : '/explore');
+  };
+
+  const logout = async () => {
+    try { await api.logout(); } catch { /* Clear the local UI even if the server is unreachable. */ }
+    setUser(null); setTracks([]); setCurrentTrack(null); setQueue([]);
+    localStorage.removeItem('musicfy:user');
+    navigate('/');
+  };
+
+  const playTrack = (track, nextQueue = tracks) => {
+    if (!track?.uri) {
+      setLibraryError('This track does not have a playable audio URL.');
+      return;
+    }
+    setQueue(nextQueue?.length ? nextQueue : [track]);
+    setCurrentTrack(track);
+    setLibraryError('');
+  };
+
+  const isAuthRoute = route === '/login' || route === '/register';
+  const renderContent = () => {
+    if (checkingSession) return <div className="grid min-h-[65vh] place-items-center"><div className="flex items-center gap-3 text-sm text-zinc-500"><LoaderCircle size={18} className="animate-spin text-violet-300" /> Restoring your MusicFy session...</div></div>;
+    if (isAuthRoute) return <AuthPage key={route} mode={route.slice(1)} onNavigate={navigate} onAuthenticate={authenticate} />;
+    if (route.startsWith('/admin')) {
+      if (!user) return <AuthPage key="login-admin" mode="login" onNavigate={navigate} onAuthenticate={authenticate} />;
+      return <AdminPage route={route} user={user} tracks={tracks} onNavigate={navigate} onDataChanged={() => loadLibrary({ quiet: true })} />;
+    }
+    if (route.startsWith('/explore')) return <ExplorePage user={user} tracks={tracks} search={search} setSearch={setSearch} onPlay={playTrack} onNavigate={navigate} loading={libraryLoading} />;
+    if (route.startsWith('/albums')) return <AlbumsPage user={user} onNavigate={navigate} onPlay={playTrack} />;
+    return <HomePage user={user} tracks={tracks} currentTrack={currentTrack} onNavigate={navigate} onPlay={playTrack} />;
+  };
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-[#09090f] text-white">
+      <AppHeader user={user} route={route} onNavigate={navigate} onLogout={logout} search={search} setSearch={setSearch} />
+      {libraryError && user && !route.startsWith('/admin') && <div className="mx-auto mt-4 flex max-w-[1440px] items-center gap-2 px-4 text-xs text-amber-300 sm:px-7 xl:px-10"><AlertCircle size={14} />{libraryError}<button onClick={() => loadLibrary({ quiet: true }).catch(() => {})} className="ml-2 font-bold underline underline-offset-2">Retry</button><button onClick={() => setLibraryError('')} className="ml-auto text-zinc-600 hover:text-white">Dismiss</button></div>}
+      {renderContent()}
+      {currentTrack && <AudioPlayer track={currentTrack} queue={queue.length ? queue : tracks} onTrackChange={setCurrentTrack} onClose={() => setCurrentTrack(null)} />}
+    </div>
+  );
+}
