@@ -1,15 +1,103 @@
-import { Disc3, Search, SlidersHorizontal, Music2 } from 'lucide-react';
-import MusicCard from '../components/MusicCard';
+import { Disc3, Search, SlidersHorizontal, Music2 } from "lucide-react";
+import MusicCard from "../components/MusicCard";
 
-export default function ExplorePage({ user, tracks, search, setSearch, onPlay, onNavigate, loading }) {
-  const filtered = tracks.filter((track) => `${track.title || ''} ${track.admin?.username || ''} ${track.admin?.email || ''}`.toLowerCase().includes(search.toLowerCase()));
+export default function ExplorePage({
+  user,
+  tracks,
+  search,
+  setSearch,
+  onPlay,
+  onNavigate,
+  loading,
+}) {
+  const filtered = tracks.filter((track) =>
+    `${track.title || ""} ${track.admin?.username || ""} ${track.admin?.email || ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
   return (
     <main className="mx-auto max-w-[1440px] px-4 pb-32 pt-10 sm:px-7 xl:px-10">
-      <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end"><div><p className="eyebrow">The collection</p><h1 className="page-title">Explore <span className="gradient-text">music.</span></h1><p className="mt-3 max-w-lg text-sm leading-6 text-zinc-500">Every track in one place. Find something that fits the moment.</p></div><div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[11px] text-zinc-400"><Disc3 size={15} className="text-violet-300" />{tracks.length} tracks in library</div></div>
-      {!user ? <div className="mt-10 rounded-3xl border border-white/[0.08] bg-[#11111a] px-6 py-14 text-center"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-violet-500/10 text-violet-300"><Music2 size={25} /></div><h2 className="mt-5 text-xl font-bold">Your library is one sign-in away</h2><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">Sign in to browse tracks published to the MusicFy collection.</p><button onClick={() => onNavigate('/login')} className="mt-6 rounded-full bg-violet-600 px-6 py-3 text-xs font-bold">Sign in to explore</button></div> : <>
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"><div className="flex flex-1 items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#11111a] px-4 py-3.5 focus-within:border-violet-400/40"><Search size={17} className="text-zinc-500" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by track or creator..." className="w-full bg-transparent text-sm outline-none placeholder:text-zinc-600" /></div><div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#11111a] px-4 py-3.5 text-xs text-zinc-500"><SlidersHorizontal size={15} /> All tracks</div></div>
-        {loading ? <div className="py-24 text-center text-sm text-zinc-500">Loading your library...</div> : filtered.length ? <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">{filtered.map((track, index) => <MusicCard key={track._id || track.id} music={track} index={index} onPlay={onPlay} />)}</div> : <div className="mt-8 rounded-3xl border border-dashed border-white/10 py-20 text-center"><Music2 className="mx-auto text-zinc-700" size={30} /><h3 className="mt-4 font-bold text-zinc-300">{tracks.length ? 'No tracks match that search' : 'No music has been uploaded yet'}</h3><p className="mt-2 text-xs text-zinc-600">{tracks.length ? 'Try another title or creator.' : 'Check back when an admin adds the first tracks.'}</p></div>}
-      </>}
+      <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+        <div>
+          <p className="eyebrow">The collection</p>
+          <h1 className="page-title">
+            Explore <span className="gradient-text">music.</span>
+          </h1>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-zinc-500">
+            Every track in one place. Find something that fits the moment.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[11px] text-zinc-400">
+          <Disc3 size={15} className="text-violet-300" />
+          {tracks.length} tracks in library
+        </div>
+      </div>
+      {!user ? (
+        <div className="mt-10 rounded-3xl border border-white/[0.08] bg-[#11111a] px-6 py-14 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-violet-500/10 text-violet-300">
+            <Music2 size={25} />
+          </div>
+          <h2 className="mt-5 text-xl font-bold">
+            Your library is one sign-in away
+          </h2>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+            Sign in to browse tracks published to the MusicFy collection.
+          </p>
+          <button
+            onClick={() => onNavigate("/login")}
+            className="mt-6 rounded-full bg-violet-600 px-6 py-3 text-xs font-bold"
+          >
+            Sign in to explore
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-1 items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#11111a] px-4 py-3.5 focus-within:border-violet-400/40">
+              <Search size={17} className="text-zinc-500" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by track or creator..."
+                className="w-full bg-transparent text-sm outline-none placeholder:text-zinc-600"
+              />
+            </div>
+            <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#11111a] px-4 py-3.5 text-xs text-zinc-500">
+              <SlidersHorizontal size={15} /> All tracks
+            </div>
+          </div>
+          {loading ? (
+            <div className="py-24 text-center text-sm text-zinc-500">
+              Loading your library...
+            </div>
+          ) : filtered.length ? (
+            <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {filtered.map((track, index) => (
+                <MusicCard
+                  key={track._id || track.id}
+                  music={track}
+                  index={index}
+                  onPlay={onPlay}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 rounded-3xl border border-dashed border-white/10 py-20 text-center">
+              <Music2 className="mx-auto text-zinc-700" size={30} />
+              <h3 className="mt-4 font-bold text-zinc-300">
+                {tracks.length
+                  ? "No tracks match that search"
+                  : "No music has been uploaded yet"}
+              </h3>
+              <p className="mt-2 text-xs text-zinc-600">
+                {tracks.length
+                  ? "Try another title or creator."
+                  : "Check back when an admin adds the first tracks."}
+              </p>
+            </div>
+          )}
+        </>
+      )}
     </main>
   );
 }
