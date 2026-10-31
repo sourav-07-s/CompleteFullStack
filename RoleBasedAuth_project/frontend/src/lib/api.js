@@ -43,7 +43,7 @@ export const api = {
       }),
     }),
   logout: () => request("/api/auth/logout", { method: "POST" }),
-  getMusic: () => request("/api/admin/"),
+  getMusic: () => request("/api/admin"),
   getAlbums: () => request("/api/admin/albums"),
   getAlbum: (id) => request(`/api/admin/albums/${id}`),
   uploadMusic: (title, file) => {
