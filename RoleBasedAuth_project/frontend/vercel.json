@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://complete-full-stack-188t.vercel.app/api/:path*"
+      "destination": "https://musicfy-api-seven.vercel.app/api/:path*"
     }
   ]
 }
