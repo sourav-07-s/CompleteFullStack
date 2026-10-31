@@ -31,7 +31,7 @@ export const api = {
   register: (data) =>
     request("/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({ ...data, role: "user" }),
+      body: JSON.stringify(data),
     }),
   login: (identifier, password) =>
     request("/api/auth/login", {
@@ -46,12 +46,39 @@ export const api = {
   getMusic: () => request("/api/admin"),
   getAlbums: () => request("/api/admin/albums"),
   getAlbum: (id) => request(`/api/admin/albums/${id}`),
-  uploadMusic: (title, file) => {
+
+  uploadMusic: async (title, file) => {
+    // 1. Get a signed upload token from our backend (admin only)
+    const auth = await request("/api/admin/imagekit-auth");
+
+    // 2. Upload the file directly to ImageKit
+    //    (skips Vercel's 4.5 MB request-size limit)
     const form = new FormData();
-    form.append("title", title);
-    form.append("music", file);
-    return request("/api/admin/upload", { method: "POST", body: form });
+    form.append("file", file);
+    form.append("fileName", `FILE_${Date.now()}_${file.name}`);
+    form.append("folder", "RoleBasedAuth_project/Admin-File");
+    form.append("publicKey", auth.publicKey);
+    form.append("signature", auth.signature);
+    form.append("expire", auth.expire);
+    form.append("token", auth.token);
+
+    const uploadResponse = await fetch(
+      "https://upload.imagekit.io/api/v1/files/upload",
+      { method: "POST", body: form },
+    );
+    const uploaded = await uploadResponse.json();
+
+    if (!uploadResponse.ok) {
+      throw new Error(uploaded?.message || "File upload to ImageKit failed");
+    }
+
+    // 3. Save only the title + file URL in our database
+    return request("/api/admin/upload", {
+      method: "POST",
+      body: JSON.stringify({ title, uri: uploaded.url }),
+    });
   },
+
   createAlbum: (title, musics) =>
     request("/api/admin/album", {
       method: "POST",
@@ -61,6 +88,6 @@ export const api = {
 
 export function getErrorMessage(error) {
   if (error instanceof TypeError)
-    return "Could not reach the backend. Make sure the API server is running on port 3000.";
+    return "Could not reach the server. Check your internet connection and try again.";
   return error?.message || "Something went wrong. Please try again.";
 }

@@ -1,4 +1,3 @@
-
 const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -65,10 +64,7 @@ async function registerUser(req, res) {
   const cleanEmail = email.trim().toLowerCase();
 
   const existingUser = await userModel.findOne({
-    $or: [
-      { username: cleanUsername },
-      { email: cleanEmail },
-    ],
+    $or: [{ username: cleanUsername }, { email: cleanEmail }],
   });
 
   if (existingUser) {
@@ -79,13 +75,24 @@ async function registerUser(req, res) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Never accept an admin role from public registration.
-  const user = await userModel.create({
-    username: cleanUsername,
-    email: cleanEmail,
-    password: hashedPassword,
-    role: "user",
-  });
+  let user;
+  try {
+    // Never accept an admin role from public registration.
+    user = await userModel.create({
+      username: cleanUsername,
+      email: cleanEmail,
+      password: hashedPassword,
+      role: "user",
+    });
+  } catch (error) {
+    // Two people registering the same username/email at the same moment
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "Username or email already exists",
+      });
+    }
+    throw error;
+  }
 
   const token = createToken(user);
 
@@ -109,10 +116,7 @@ async function loginUser(req, res) {
   }
 
   const user = await userModel.findOne({
-    $or: [
-      { username: identifier },
-      { email: identifier.toLowerCase() },
-    ],
+    $or: [{ username: identifier }, { email: identifier.toLowerCase() }],
   });
 
   if (!user) {
@@ -121,10 +125,7 @@ async function loginUser(req, res) {
     });
   }
 
-  const passwordValid = await bcrypt.compare(
-    password,
-    user.password
-  );
+  const passwordValid = await bcrypt.compare(password, user.password);
 
   if (!passwordValid) {
     return res.status(401).json({
@@ -143,12 +144,7 @@ async function loginUser(req, res) {
 }
 
 async function logoutUser(req, res) {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: "lax",
-    path: "/",
-  });
+  res.clearCookie("token", cookieOptions);
 
   return res.status(200).json({
     message: "User logout successful",
@@ -158,5 +154,6 @@ async function logoutUser(req, res) {
 module.exports = {
   registerUser,
   loginUser,
+  getUploadAuth,
   logoutUser,
 };

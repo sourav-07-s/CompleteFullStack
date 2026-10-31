@@ -1,22 +1,17 @@
 const { ImageKit } = require("@imagekit/nodejs");
 
 const ImagekitClient = new ImageKit({
-    privateKey: process.env.IMAGEKIT_P_KEY
+  privateKey: process.env.IMAGEKIT_P_KEY,
 });
 
-async function uploadFile(fileBuffer) {
+// Returns { token, expire, signature } so the browser can upload
+// directly to ImageKit (avoids Vercel's 4.5 MB request limit).
+function getUploadAuth() {
+  if (!process.env.IMAGEKIT_P_KEY || !process.env.IMAGEKIT_PUBLIC_KEY) {
+    throw new Error("ImageKit keys are missing");
+  }
 
-    console.log("ImageKit: upload started");
-
-    const results = await ImagekitClient.files.upload({
-        file: fileBuffer,
-        fileName: "FILE_" + Date.now(),
-        folder: "RoleBasedAuth_project/Admin-File"
-    });
-
-    console.log("ImageKit: upload finished");
-
-    return results;
+  return ImagekitClient.helper.getAuthenticationParameters();
 }
 
-module.exports = { uploadFile };
+module.exports = { getUploadAuth };
