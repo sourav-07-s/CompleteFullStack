@@ -1,0 +1,10 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://musicfy-api-seven.vercel.app/api/:path*"
+    }
+  ]
+}
+

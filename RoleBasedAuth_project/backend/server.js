@@ -6,11 +6,14 @@ const dbConnect = require('./src/db/db') ;
 
 
 
-
+const PORT = process.env.PORT || 3000;
 
 
 dbConnect() ;   
 
-app.listen(3000 ,()=>{
-    console.log("server is running on port 3000") ;
-})
+
+
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
