@@ -5,12 +5,12 @@ const app = require("./src/app");
 
 const PORT = process.env.PORT || 3000;
 
-// Start a local server only during local development
-if (process.env.VERCEL !== "1") {
+// Start a local HTTP server only when running node server.js.
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`MusicFy server running on port ${PORT}`);
   });
 }
 
-// Export Express app for Vercel
+// Vercel imports this Express application.
 module.exports = app;

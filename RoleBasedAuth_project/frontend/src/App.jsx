@@ -110,35 +110,28 @@ export default function App() {
 
     setUser(nextUser);
     localStorage.setItem("musicfy:user", JSON.stringify(nextUser));
-    try {
-      await loadLibrary({ quiet: true });
-    } catch {
-     alert("Failed to load music library:");
-
-     console.error("Failed to load music library:", error);
-    }
+   try {
+  await loadLibrary({ quiet: true });
+} catch (error) {
+  console.error("Failed to load music library:", error);
+  // Authentication succeeded; library loading can be retried.
+}
     navigate(nextUser.role === "admin" ? "/admin" : "/explore");
   };
 
   const logout = async () => {
-    try {
-      await api.logout();
-    } catch {
-       console.error("Logout request failed:", error);
-    }finally {
-
-       setUser(null);
-
-    }
-
-
-    
+   try {
+    await api.logout();
+  } catch (error) {
+    console.error("Logout request failed:", error);
+  } finally {
     setUser(null);
     setTracks([]);
     setCurrentTrack(null);
     setQueue([]);
     localStorage.removeItem("musicfy:user");
     navigate("/");
+  }
   };
 
   const playTrack = (track, nextQueue = tracks) => {
