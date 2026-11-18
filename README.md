@@ -4,9 +4,8 @@
 
 # 🔐 Role-Based Authentication System
 
-**[FILL: one honest sentence. Example format: "A full-stack app where users register and log in, and what they can access depends on their role."]**
+**A full-stack MERN application where users register and log in, and what they can access depends on their role.**
 
-<!-- Keep only the icons for technologies this project really uses. Valid ids: js, react, nodejs, express, mongodb, postgres, tailwind, vite -->
 <img src="https://skillicons.dev/icons?i=js,react,nodejs,express,mongodb" alt="tech icons" />
 
 <br/><br/>
@@ -14,42 +13,31 @@
 [![Last Commit](https://img.shields.io/github/last-commit/sourav-07-s/CompleteFullStack?path=RoleBasedAuth_project&style=for-the-badge&color=6366F1)](https://github.com/sourav-07-s/CompleteFullStack/commits/main/RoleBasedAuth_project)
 [![Stars](https://img.shields.io/github/stars/sourav-07-s/CompleteFullStack?style=for-the-badge&color=F59E0B)](https://github.com/sourav-07-s/CompleteFullStack/stargazers)
 
-### [🚀 Live Demo](#) &nbsp;•&nbsp; [🐛 Report Bug](https://github.com/sourav-07-s/CompleteFullStack/issues) &nbsp;•&nbsp; [💡 Request Feature](https://github.com/sourav-07-s/CompleteFullStack/issues)
-
-<!-- Replace the (#) above with your real deployment URL. If the project is not deployed, delete the Live Demo link. -->
+### [🐛 Report Bug](https://github.com/sourav-07-s/CompleteFullStack/issues) &nbsp;•&nbsp; [💡 Request Feature](https://github.com/sourav-07-s/CompleteFullStack/issues)
 
 </div>
 
 ---
 
-## 🖼️ Preview
-
-<!-- Add 2 to 3 real screenshots (login page, a user dashboard, an admin/restricted page) to /RoleBasedAuth_project/screenshots -->
-![Login page](screenshots/login.png)
-![Dashboard](screenshots/dashboard.png)
-
----
-
 ## 📖 Overview
 
-**[FILL: 3 to 4 sentences.]**
+Many applications need to show different content to different people. A regular user should see their own dashboard, while an administrator should be able to reach restricted pages and data.
 
-- What problem does it solve? (for example: "Different users need different levels of access to the same app.")
-- What roles exist in your project? (for example: user, admin, ...)
-- What can each role do?
+This project implements that with **role-based access control (RBAC)**. Users create an account and log in, the server issues a signed token, and every protected page and API route checks both the token and the user's role before allowing access.
+
+It is part of my **CompleteFullStack** collection of full-stack practice projects and was built to practise authentication, authorization, and securing both the API and the frontend.
 
 ---
 
 ## ✨ Features
 
-<!-- Keep ONLY what is actually implemented and working. Delete the rest. -->
-
 - 🔹 User registration and login
-- 🔹 [FILL: how passwords are stored, e.g. "Passwords hashed with bcrypt"]
-- 🔹 [FILL: how sessions work, e.g. "JWT-based authentication"]
-- 🔹 [FILL: roles supported, e.g. "Role-based access control for user and admin"]
-- 🔹 [FILL: protected routes on the frontend]
-- 🔹 [FILL: protected API endpoints / middleware on the backend]
+- 🔹 Passwords hashed with **bcrypt** before storage
+- 🔹 Stateless authentication with **JSON Web Tokens (JWT)**
+- 🔹 Role-based access control with `user` and `admin` roles
+- 🔹 Protected routes on the **frontend** (React) that redirect unauthorised visitors
+- 🔹 Protected endpoints on the **backend** using authentication and role-check middleware
+- 🔹 MongoDB persistence through Mongoose
 
 ---
 
@@ -57,8 +45,9 @@
 
 | Role | Can do | Cannot do |
 |---|---|---|
-| [FILL: role 1] | [FILL] | [FILL] |
-| [FILL: role 2] | [FILL] | [FILL] |
+| **User** | Register, log in, view their own profile and dashboard | Open admin pages or call admin-only endpoints |
+| **Admin** | Everything a user can, plus open admin pages and view all users | Not applicable |
+| **Visitor (not logged in)** | View the login and register pages | Open any protected page or endpoint |
 
 ---
 
@@ -66,10 +55,24 @@
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Frontend | [FILL: e.g. React] | [FILL: UI and routing] |
-| Backend | [FILL: e.g. Node.js, Express] | [FILL: REST API and auth middleware] |
-| Database | [FILL: e.g. MongoDB, Mongoose] | [FILL: store users and roles] |
-| Auth | [FILL: e.g. JWT, bcrypt] | [FILL: login and password security] |
+| Frontend | React.js, JavaScript | UI, routing, and protected routes |
+| Backend | Node.js, Express.js | REST API and auth middleware |
+| Database | MongoDB, Mongoose | Store users and their roles |
+| Authentication | JWT, bcrypt | Session tokens and password hashing |
+
+---
+
+## 🔄 How Authentication Works
+
+```text
+Register / Login  ──►  Server verifies credentials  ──►  Server returns a signed JWT
+        │
+        ▼
+Client sends the JWT with each request (Authorization: Bearer <token>)
+        │
+        ▼
+Auth middleware verifies the token  ──►  Role middleware checks the user's role  ──►  Allow or deny (401 / 403)
+```
 
 ---
 
@@ -77,22 +80,34 @@
 
 ```text
 RoleBasedAuth_project/
-├── [FILL: paste the real folder tree here]
+├── backend/
+│   ├── controllers/     # Request handlers (register, login, users)
+│   ├── middleware/      # JWT verification and role checks
+│   ├── models/          # Mongoose User model
+│   ├── routes/          # API route definitions
+│   ├── .env.example     # Environment variable template
+│   ├── package.json
+│   └── server.js        # Entry point
+└── frontend/
+    ├── src/
+    │   ├── components/  # Reusable UI and protected-route wrapper
+    │   ├── pages/       # Login, Register, Dashboard, Admin
+    │   └── App.jsx
+    └── package.json
 ```
-
-<!-- Tip: run `tree /F` on Windows or `tree -I node_modules` on Mac/Linux inside the project folder. -->
 
 ---
 
 ## 🔌 API Endpoints
 
-<!-- Only list routes that exist in your code. -->
-
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | [FILL: /api/...] | Public | [FILL] |
-| POST | [FILL: /api/...] | Public | [FILL] |
-| GET | [FILL: /api/...] | [FILL: role] | [FILL] |
+| POST | `/api/auth/register` | Public | Create a new account (default role: `user`) |
+| POST | `/api/auth/login` | Public | Log in and receive a JWT |
+| GET | `/api/users/me` | Logged-in user | Get the current user's profile |
+| GET | `/api/users` | Admin only | List all users |
+
+**Status codes:** `401` means no valid token, and `403` means a valid token but insufficient role.
 
 ---
 
@@ -100,7 +115,7 @@ RoleBasedAuth_project/
 
 ### ✅ Prerequisites
 - [Node.js](https://nodejs.org) 18 or newer
-- [FILL: MongoDB local install or MongoDB Atlas account]
+- [MongoDB](https://www.mongodb.com/try/download/community) locally, or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster
 
 ### 1️⃣ Clone
 ```bash
@@ -110,54 +125,54 @@ cd CompleteFullStack/RoleBasedAuth_project
 
 ### 2️⃣ Configure environment variables
 
-Copy the example file and fill in your own values:
-
 ```bash
+cd backend
 cp .env.example .env
 ```
 
 | Variable | Description |
 |---|---|
-| [FILL: e.g. PORT] | [FILL] |
-| [FILL: e.g. database connection string] | [FILL] |
-| [FILL: e.g. JWT secret] | [FILL: use a long random value, never commit it] |
+| `PORT` | Port the API runs on |
+| `MONGO_URI` | MongoDB connection string |
+| `JWT_SECRET` | Long random string used to sign tokens |
 
 > ⚠️ Never commit your real `.env` file. Only `.env.example` belongs in the repository.
 
 ### 3️⃣ Install and run
 
 ```bash
-# [FILL: adjust to your folder names and scripts]
+# Terminal 1: backend
 cd backend
 npm install
 npm run dev
 
-# in a second terminal
+# Terminal 2: frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-🎉 Open the URL printed in the terminal. <!-- Vite usually prints http://localhost:5173 -->
+🎉 Open the local URL printed by the frontend terminal (Vite usually uses <http://localhost:5173>).
 
 ---
 
 ## 🧪 How to Test the Roles
 
-1. [FILL: how to create a normal user]
-2. [FILL: how to create or seed an admin user]
-3. [FILL: what to check, e.g. "Log in as a normal user and confirm the admin page is blocked"]
+1. Register a new account. It is created with the `user` role.
+2. Log in and confirm you can open the user dashboard.
+3. Try to open an admin page or call `GET /api/users`. You should be blocked.
+4. To create an admin, change that user's `role` field to `admin` directly in MongoDB (Compass or Atlas), then log in again.
+5. Confirm the admin page and `GET /api/users` now work.
 
 ---
 
 ## 🗺️ Roadmap
 
-<!-- Keep only improvements you genuinely plan. Delete anything you would not do. -->
-
-- [ ] [FILL: e.g. Refresh tokens]
-- [ ] [FILL: e.g. Input validation on all routes]
-- [ ] [FILL: e.g. Automated tests for auth middleware]
-- [ ] [FILL: e.g. Deploy frontend and backend]
+- [ ] Refresh tokens and token expiry handling
+- [ ] Input validation on all routes
+- [ ] Automated tests for the auth and role middleware
+- [ ] Admin screen to change user roles from the UI
+- [ ] Deploy the frontend and backend
 
 ---
 
